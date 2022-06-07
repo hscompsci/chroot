@@ -18,14 +18,17 @@ mkdir etc
 mkdir lib
 mkdir usr
 mount -R /dev dev
-mount -B /etc etc
-mount -B /lib lib
-mount -Bo nosuid /usr usr
+mount -Bo ro /etc etc
+mount -Bo ro /lib lib
+mount -Bo ro,nosuid /usr usr
+
+mkdir proc
+mkdir home
+mount -t tmpfs none home
+cp -r etc/skel home/nobody
+mount -o remount,ro none .
 
 # Allow unshare within chroot.
 mount -M . / 2>/dev/null
 
-mkdir proc
-mkdir home
-cp -r etc/skel home/nobody
 exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" chroot . unshare -Upf --mount-proc
