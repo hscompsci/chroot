@@ -1,0 +1,30 @@
+#!/usr/bin/env -S unshare -rm sh
+
+if [ "$#" -ne "1" ]
+then
+	echo "USAGE: $0 <mountpoint>"
+	exit 1
+fi
+
+dir="$1"
+mount -t tmpfs none "$dir"
+cd "$dir"
+
+ln -s lib/x86_64-linux-gnu lib64
+ln -s usr/bin .
+mkdir dev
+mkdir etc
+mkdir lib
+mkdir usr
+mount -R /dev dev
+mount -B /etc etc
+mount -B /lib lib
+mount -Bo nosuid /usr usr
+
+# Allow unshare within chroot.
+mount -M . / 2>/dev/null
+
+mkdir proc
+mkdir home
+cp -r etc/skel home/nobody
+exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" chroot . unshare -Upf --mount-proc
