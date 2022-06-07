@@ -7,6 +7,7 @@ then
 fi
 
 dir="$1"
+[ -e "$dir" ] || mkdir "$dir"
 mount -t tmpfs none "$dir"
 cd "$dir"
 
