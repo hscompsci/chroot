@@ -1,0 +1,9 @@
+#!/usr/bin/env -S unshare -r --map-auto sh
+
+if [ "$#" -ne "1" ]
+then
+	echo "USAGE: $0 <former mountpoint>"
+	exit 1
+fi
+
+exec chown root: "$1"
