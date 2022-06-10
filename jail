@@ -21,7 +21,14 @@ fi
 cd "$dir"
 
 ln -sf lib/x86_64-linux-gnu lib64
-ln -sf usr/bin .
+if [ -d bin ]
+then
+	ln -sf ../usr/bin/sh bin
+	ln -sf "../usr/bin/`basename "$SHELL"`" bin
+else
+	ln -sf usr/bin .
+fi
+
 mkdir -p dev
 mkdir -p etc
 mkdir -p lib
