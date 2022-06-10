@@ -1,4 +1,4 @@
-#!/usr/bin/env -S unshare -rm sh
+#!/usr/bin/env -S unshare -rm --map-auto sh
 
 if [ "$#" -ne "1" ]
 then
@@ -8,25 +8,40 @@ fi
 
 dir="$1"
 [ -e "$dir" ] || mkdir "$dir"
-mount -t tmpfs none "$dir"
+if [ -n "`ls "$dir"`" ]
+then
+	# Workaround so mount -M will not be a no-op.
+	mount -B "$dir" "$dir"
+
+	nonempty="true"
+else
+	mount -t tmpfs none "$dir"
+	nonempty="false"
+fi
 cd "$dir"
 
-ln -s lib/x86_64-linux-gnu lib64
-ln -s usr/bin .
-mkdir dev
-mkdir etc
-mkdir lib
-mkdir usr
+ln -sf lib/x86_64-linux-gnu lib64
+ln -sf usr/bin .
+mkdir -p dev
+mkdir -p etc
+mkdir -p lib
+mkdir -p usr
 mount -R /dev dev
 mount -Bo ro /etc etc
 mount -Bo ro /lib lib
 mount -Bo ro,nosuid /usr usr
 
-mkdir proc
-mkdir home
+mkdir -p proc
+mkdir -p home
 mount -t tmpfs none home
 cp -r etc/skel home/nobody
-mount -o remount,ro none .
+
+if "$nonempty"
+then
+	chown nobody: .
+else
+	mount -o remount,ro none .
+fi
 
 # Allow unshare within chroot.
 mount -M . / 2>/dev/null
