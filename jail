@@ -38,9 +38,11 @@ mount -Bo ro /etc etc
 mount -Bo ro /lib lib
 mount -Bo ro,nosuid /usr usr
 
-mkdir -p proc
 mkdir -p home
+mkdir -p proc
+mkdir -p tmp
 mount -t tmpfs none home
+mount -t tmpfs none tmp
 cp -r etc/skel home/nobody
 
 if "$nonempty"
