@@ -14,6 +14,7 @@ then
 	# Workaround so mount -M will not be a no-op.
 	mount -B "$dir" "$dir"
 
+	[ -e "$dir/home" ] || chown -R nobody: "$dir"
 	nonempty="true"
 else
 	mount -t tmpfs none "$dir"
@@ -49,7 +50,7 @@ cp -r etc/skel/. home/nobody
 
 if "$nonempty"
 then
-	chown nobody: .
+	chown nobody: home
 else
 	mount -o remount,ro none .
 fi
