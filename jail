@@ -41,11 +41,11 @@ mount -Bo ro /lib lib
 mount -R /proc proc
 mount -Bo ro,nosuid /usr usr
 
-mkdir -p home
+mkdir -p home/nobody
 mkdir -p tmp
-mount -t tmpfs none home
+mount -t tmpfs none home/nobody
 mount -t tmpfs none tmp
-cp -r etc/skel home/nobody
+cp -r etc/skel/. home/nobody
 
 if "$nonempty"
 then
