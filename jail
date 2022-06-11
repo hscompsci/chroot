@@ -11,6 +11,9 @@ shift
 [ -e "$dir" ] || mkdir "$dir"
 if [ -n "`ls "$dir"`" ]
 then
+	# Workaround so mount -M will not be a no-op.
+	mount -B "$dir" "$dir"
+
 	nonempty="true"
 else
 	mount -t tmpfs none "$dir"
@@ -30,14 +33,15 @@ fi
 mkdir -p dev
 mkdir -p etc
 mkdir -p lib
+mkdir -p proc
 mkdir -p usr
 mount -R /dev dev
 mount -Bo ro /etc etc
 mount -Bo ro /lib lib
+mount -R /proc proc
 mount -Bo ro,nosuid /usr usr
 
 mkdir -p home
-mkdir -p proc
 mkdir -p tmp
 mount -t tmpfs none home
 mount -t tmpfs none tmp
@@ -50,4 +54,7 @@ else
 	mount -o remount,ro none .
 fi
 
-exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" unshare -UR. -pf --mount-proc "$@"
+# Allow unshare within unshare -R.
+mount -M . / 2>/dev/null
+
+exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" unshare -R. unshare -Upf --mount-proc "$@"
