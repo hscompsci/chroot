@@ -11,9 +11,6 @@ shift
 [ -e "$dir" ] || mkdir "$dir"
 if [ -n "`ls "$dir"`" ]
 then
-	# Workaround so mount -M will not be a no-op.
-	mount -B "$dir" "$dir"
-
 	nonempty="true"
 else
 	mount -t tmpfs none "$dir"
@@ -53,7 +50,4 @@ else
 	mount -o remount,ro none .
 fi
 
-# Allow unshare within chroot.
-mount -M . / 2>/dev/null
-
-exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" chroot . unshare -Upf --mount-proc "$@"
+exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" unshare -UR. -pf --mount-proc "$@"
