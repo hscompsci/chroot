@@ -58,4 +58,4 @@ fi
 # Allow unshare within unshare -R.
 mount -M . / 2>/dev/null
 
-exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" unshare -R. unshare -Upf --mount-proc "$@"
+exec env -i HOME=/home/nobody PATH="$PATH" SHELL="$SHELL" TERM="$TERM" unshare -R. unshare -Upf --mount-proc --kill-child "$@"
