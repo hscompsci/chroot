@@ -2,7 +2,23 @@
 
 if [ "$#" -eq "0" ]
 then
-	echo "USAGE: $0 <mountpoint> [cmdline]..."
+	cat <<-tac
+		USAGE: $0 <mountpoint> [cmdline]...
+
+		Enters a container at <mountpoint>---which can be an empty/nonexistent directory or
+		a template root "filesystem" (in which case it will be write protected)---and
+		executes the specified [cmdline] if provided (or otherwise spawns an instance of the
+		current shell).
+
+		Note that while most resources are isolated from the rest of the system, notable
+		exceptions include interprocess communication, networking, and the abstract sockets
+		namespace.  The container is intended for use on a headless system, since otherwise
+		its contents could break out via the X Window System.
+
+		Once a directory tree has been write protected by this command, one must manually
+		reverse this operation in order to remove it.  This can be done via the accompanying
+		unprotect script.
+	tac
 	exit 1
 fi
 
